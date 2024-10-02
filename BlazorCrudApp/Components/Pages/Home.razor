@@ -1,0 +1,97 @@
+﻿@page "/"
+@using BlazorCrudApp.Model
+@using BlazorCrudApp.Repository
+
+@rendermode InteractiveServer
+
+<div class="container">
+    <div class="row heading">
+        <h3>Employee Government List</h3>
+    </div>
+    <br />
+    <br />
+    <div class="row">
+        <div class="col-md-2" style="padding-left: 0px;">
+            <a href="/employeeadd" class="btn btn-primary btn-sm mb-1">
+                New Employee
+            </a>
+        </div>
+        <div class="col-md-10" />
+    </div>
+
+    <div class="row tblEmployees">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Govt. Id</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Address</th>
+                    <th>Salary</th>
+                    <th>Designation</th>
+                    <th>HasDependents</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (true)
+                {
+                    foreach (var emp in EmployeeRecords)
+                    {
+                        <tr>
+                            <td>@emp.EmployeeGovtId</td>
+                            <td>@emp.EmployeeName</td>
+                            <td>@emp.Age</td>
+                            <td>@emp.Address</td>
+                            <td>@emp.Salary</td>
+                            <td>@emp.Designation</td>
+                            <td>@emp.DisplayForDependents</td>
+                            <td>
+                                <a href="@($"employeeupdate/{emp.EmployeeId}")" title="Edit Employee" class="btn btn-info btn-sm mb-1">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="@($"employeedetail/{emp.EmployeeId}")" title="Employee Details" class="btn btn-primary btn-sm mb-1">
+                                    <i class="fas fa-sticky-note"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    private string Title = "Employee Management";
+
+    public List<EmployeeRecord> EmployeeRecords { get; set; }
+
+    [Inject]
+    public IRepository<Employee> Repository { get; set; }
+
+    protected override void OnInitialized()
+    {
+        EmployeeRecords = new List<EmployeeRecord>();
+
+        var result = Repository.GetAll();
+
+        if (result.Count() > 0)
+        {
+            foreach (var item in result)
+            {
+                EmployeeRecords.Add(new EmployeeRecord()
+                {
+                    EmployeeId = item.EmployeeId,
+                    Address = item.Address,
+                    Age = item.Age,
+                    Designation = item.Designation,
+                    EmployeeGovtId = item.EmployeeGovtId,
+                    EmployeeName = item.EmployeeName,
+                    HasDependents = item.HasDependents.Value,
+                    Salary = item.Salary,
+                });
+            }
+        }
+    }
+}

@@ -1,0 +1,160 @@
+﻿@page "/employeeupdate/{EmployeeId:int}"
+@using BlazorCrudApp.Model
+@using BlazorCrudApp.Repository
+
+@rendermode InteractiveServer
+
+<div class="container">
+    <div class="row">
+        @if (!string.IsNullOrEmpty(StatusMessage))
+        {
+            <div class="alert @StatusClass statusMessage">@StatusMessage</div>
+        }
+    </div>
+
+    <div class="row">
+        <h3>Update Employee</h3>
+    </div>
+
+    <EditForm Enhance
+              Model="EmployeeRecord"
+              OnValidSubmit="OnEmployeeSubmit"
+              FormName="frmEditEmployee">
+
+        <div class="row mb-3">
+            <label for="govtid" class="col-form-label col-md-3">Govt ID: </label>
+            <div class="col-md-8">
+                <InputText id="govtid" class="form-control col-md-8" @bind-Value="@EmployeeRecord.EmployeeGovtId" placeholder="Enter govt. id"></InputText>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="govtid" class="col-form-label col-md-3">Name: </label>
+            <div class="col-md-8">
+                <InputText id="govtid" class="form-control col-md-8" @bind-Value="@EmployeeRecord.EmployeeName" placeholder="Enter employee name"></InputText>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="age" class="col-form-label col-md-3">Age: </label>
+            <div class="col-md-8">
+                <InputNumber id="age" class="form-control col-md-8" @bind-Value="@EmployeeRecord.Age"></InputNumber>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="address" class="col-form-label col-md-3">Address: </label>
+            <div class="col-md-8">
+                <InputText id="address" class="form-control col-md-8" @bind-Value="@EmployeeRecord.Address" placeholder="Enter employee address"></InputText>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="salary" class="col-form-label col-md-3">Salary: </label>
+            <div class="col-md-8">
+                <InputNumber id="salary" class="form-control col-md-8" @bind-Value="@EmployeeRecord.Salary"></InputNumber>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="designation" class="col-form-label col-md-3">Designation: </label>
+            <div class="col-md-8">
+                <InputText id="designation" class="form-control col-md-8" @bind-Value="@EmployeeRecord.Designation" placeholder="Enter employee designation"></InputText>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="hasDependents" class="col-form-label col-md-3">Has Dependents?: </label>
+            <div class="col-md-2">
+                <InputCheckbox id="hasDependents" class="form-check" style="height:20px; width:20px;" @bind-Value="@EmployeeRecord.HasDependents"></InputCheckbox>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary submitButton">Save</button>
+            </div>
+            <div class="col-md-1">
+                <button type="reset" class="btn btn-primary submitButton" @onclick="@Reset">Clear</button>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-info" @onclick="@NavigateToMain">Home</button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter]
+    public int EmployeeId { get; set; }
+
+    protected string StatusMessage = string.Empty;
+    protected string StatusClass = string.Empty;
+
+    private string Title = "Employee Update";
+
+    [SupplyParameterFromForm]
+    public EmployeeRecord EmployeeRecord { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    public IRepository<Employee> Repository { get; set; }
+
+    protected override void OnInitialized()
+    {
+        StatusClass = string.Empty;
+        StatusMessage = string.Empty;
+        LoadEmployee();
+    }
+
+    protected void OnEmployeeSubmit()
+    {
+        Employee empObject = new Employee();
+
+        empObject.EmployeeId = EmployeeRecord.EmployeeId;
+        empObject.Address = EmployeeRecord.Address;
+        empObject.Age = EmployeeRecord.Age;
+        empObject.Designation = EmployeeRecord.Designation;
+        empObject.EmployeeGovtId = EmployeeRecord.EmployeeGovtId;
+        empObject.EmployeeName = EmployeeRecord.EmployeeName;
+        empObject.HasDependents = EmployeeRecord.HasDependents;
+        empObject.Salary = EmployeeRecord.Salary;
+
+        Repository.Update(empObject);
+        StatusClass = "alert-success";
+        StatusMessage = "Employee successfully updated.";
+        LoadEmployee();
+    }
+
+    private void LoadEmployee()
+    {
+        Employee empObject = new Employee();
+        EmployeeRecord = new EmployeeRecord();
+
+        empObject = new Employee();
+        empObject = Repository.GetByID(EmployeeId);
+        EmployeeRecord.EmployeeId = empObject.EmployeeId;
+        EmployeeRecord.Address = empObject.Address;
+        EmployeeRecord.Age = empObject.Age;
+        EmployeeRecord.Designation = empObject.Designation;
+        EmployeeRecord.EmployeeGovtId = empObject.EmployeeGovtId;
+        EmployeeRecord.EmployeeName = empObject.EmployeeName;
+        EmployeeRecord.HasDependents = empObject.HasDependents.Value;
+        EmployeeRecord.Salary = empObject.Salary;
+    }
+
+    protected void Reset()
+    {
+        StatusClass = string.Empty;
+        StatusMessage = string.Empty;
+        EmployeeRecord = new EmployeeRecord();
+        EmployeeRecord.EmployeeId = EmployeeId;
+    }
+
+    protected void NavigateToMain()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

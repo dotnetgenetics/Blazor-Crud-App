@@ -1,0 +1,26 @@
+#divCreateLink {
+    margin-top: 40px;
+    margin-bottom: 10px;
+    color: white !important;
+}
+
+    #divCreateLink span {
+        margin-left: 5px;
+    }
+
+.divCompanyHeader {
+    margin-top: 50px;
+    text-align: center;
+}
+
+#chkDependents {
+    margin-left: 0px !important;
+}
+
+#spnDependents {
+    margin-left: 20px;
+}
+
+table i {
+    color: black;
+}
